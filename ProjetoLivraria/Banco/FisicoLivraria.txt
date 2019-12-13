@@ -1,0 +1,117 @@
+===\\ Criação do Banco //====
+
+CREATE DATABASE "Livraria"
+ENCODING 'WIN1252'
+TEMPLATE = template0
+CONNECTION LIMIT -1;
+
+===\\ Criação Objetos Banco //===
+
+CREATE TABLE tb_categoria(
+id_categoria		SERIAL,
+nm_categoria		VARCHAR(120) CONSTRAINT nn_nm_categoria NOT NULL,
+desc_categoria		TEXT CONSTRAINT nn_desc_categoria NOT NULL,
+CONSTRAINT pk_id_categ_tb_categ PRIMARY KEY(id_categoria) 
+);
+
+CREATE TABLE tb_editora(
+id_editora		SERIAL,
+nm_editora		VARCHAR(120) CONSTRAINT nn_nm_editora NOT NULL,
+CNPJ			VARCHAR(120) CONSTRAINT nn_CNPJ NOT NULL,
+CONSTRAINT pk_id_edit_tb_edit PRIMARY KEY(id_editora) 
+);
+
+CREATE TABLE tb_Autor(
+id_autor		SERIAL,
+nm_autor		VARCHAR(120) CONSTRAINT nn_nm_autor NOT NULL,
+sobrenome_autor		VARCHAR(120) CONSTRAINT nn_sobrenome_autor NOT NULL,
+CONSTRAINT pk_id_autor_tb_autor PRIMARY KEY(id_autor) 
+);
+
+CREATE TABLE tb_contato(
+id_contato	SERIAL,
+telefone	VARCHAR(15),	
+email		VARCHAR(120) CONSTRAINT nn_email NOT NULL,
+celular		VARCHAR(15) CONSTRAINT nn_celular NOT NULL,
+CONSTRAINT pk_id_contato_tb_contato PRIMARY KEY(id_contato)
+)
+
+CREATE TABLE Tb_Endereco (
+id_endereco 	SERIAL,
+bairro 		VARCHAR(120) CONSTRAINT nn_bairro NOT NULL,
+estado		CHAR(3) CONSTRAINT nn_estado NOT NULL,
+CEP 		VARCHAR(20) CONSTRAINT nn_CEP NOT NULL,
+cidade 		VARCHAR(120) CONSTRAINT nn_cidade NOT NULL,
+logradouro 	VARCHAR(80) CONSTRAINT nn_logradouro NOT NULL,
+CONSTRAINT pk_id_ende_tb_ende PRIMARY KEY(id_endereco)
+);
+
+CREATE TABLE Tb_Cliente(
+id_cliente 		SERIAL,
+id_endereco 		SERIAL,
+id_contato		SERIAL,
+CPF 			VARCHAR(15) CONSTRAINT nn_CPF NOT NULL,
+sobrenome_cliente 	VARCHAR(120) CONSTRAINT nn_sobrenome_cliente NOT NULL,
+nm_cliente 		VARCHAR(120) CONSTRAINT nn_nm_cliente NOT NULL,
+sexo			CHAR(2) CONSTRAINT nn_sexo NOT NULL,
+CONSTRAINT pk_id_clente_tb_cliente PRIMARY KEY(id_cliente),
+CONSTRAINT fk_id_ende_tb_cliente FOREIGN KEY(id_endereco) REFERENCES tb_endereco(id_endereco),
+CONSTRAINT fk_id_contato_tb_cliente FOREIGN KEY(id_contato) REFERENCES tb_contato(id_contato)
+);
+
+CREATE TABLE Tb_Compra (
+id_compra 		SERIAL,
+id_cliente 		SERIAL,
+id_forma_pagamento	SERIAL,
+data_compra 		DATE CONSTRAINT nn_data_compra NOT NULL,
+valor_total		NUMERIC(5,2) CONSTRAINT nn_valor_total NOT NULL
+		        CHECK(valor_total > 0),
+CONSTRAINT pk_id_compra PRIMARY KEY(id_compra),
+CONSTRAINT fk_id_cliente_tb_compra FOREIGN KEY(id_cliente) REFERENCES tb_cliente(id_cliente),
+CONSTRAINT fk_id_forma_pagamento_tb_compra FOREIGN KEY(id_forma_pagamento) REFERENCES tb_forma_pagamento(id_forma_pagamento)
+);
+
+CREATE TABLE tb_forma_pagamento(
+id_forma_pagamento	SERIAL,
+nm_forma_pagamento	VARCHAR(30),
+CONSTRAINT pk_id_forma_pagamento PRIMARY KEY(id_forma_pagamento)
+);
+
+CREATE TABLE tb_livro(
+id_livro		SERIAL,
+id_editora		SERIAL,
+id_categoria		SERIAL,
+id_autor		SERIAL,
+desc_livro		TEXT CONSTRAINT nn_desc_livro NOT NULL,
+nm_livro		VARCHAR(120) CONSTRAINT nn_nm_livro NOT NULL,
+idioma			VARCHAR(30) CONSTRAINT nn_idioma NOT NULL,
+qtd_pagina		INTEGER,
+qtd_estoque		INTEGER CONSTRAINT nn_qtd_estoque NOT NULL
+			CONSTRAINT ck_qtdEstoque CHECK (qtd_estoque > 0),
+valor_livro		NUMERIC(5,2) CONSTRAINT nn_valor_livro NOT NULL
+			CONSTRAINT ck_valor_livro CHECK (valor_livro > 0),
+ano_livro		VARCHAR(11) CONSTRAINT nn_ano_livro NOT NULL,
+CONSTRAINT pk_id_livro_tb_livro PRIMARY KEY(id_livro),
+CONSTRAINT fk_id_editora_tb_livro FOREIGN KEY(id_editora) REFERENCES tb_editora(id_editora),
+CONSTRAINT fk_id_categ_tb_livro FOREIGN KEY(id_categoria) REFERENCES tb_categoria(id_categoria),
+CONSTRAINT fk_id_autor_tb_livro FOREIGN KEY(id_autor) REFERENCES tb_autor(id_autor)
+);
+
+CREATE TABLE Tb_Item_Compra (
+id_item_compra 		SERIAL,
+id_compra 		SERIAL,
+id_livro 		SERIAL,
+valor_compra 		NUMERIC CONSTRAINT nn_valor_compra NOT NULL
+			CONSTRAINT ck_valor_compra CHECK (valor_compra > 0),
+valor_uni 		NUMERIC CONSTRAINT nn_valor_uni NOT NULL
+			CONSTRAINT ck_valor_uni CHECK (valor_uni > 0),			
+qtd_compra 		INTEGER CONSTRAINT nn_qtd_compra NOT NULL,
+CONSTRAINT pk_item_compra_tb_item_compra PRIMARY KEY(id_item_compra),
+CONSTRAINT fk_id_compra_tb_item_compra FOREIGN KEY(id_compra) REFERENCES tb_compra(id_compra),
+CONSTRAINT fk_id_livro_tb_item_compra FOREIGN KEY(id_livro) REFERENCES tb_livro(id_livro)
+);
+
+
+
+
+
